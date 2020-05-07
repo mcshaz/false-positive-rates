@@ -9,11 +9,11 @@ Currently under casual development.
 
 ## Contents
 
-- [simulation-1.R](blob/master/simulation-1.R)
+- [simulation-1.R](simulation-1.R)
 	- Initial attempt to calculate false positive rates
-- [simulation-2.R](blob/master/simulation-2.R)
+- [simulation-2.R](simulation-2.R)
 	- Refactoring of simulation-1
-- [simulation-3.R](blob/master/simulation-3.R)
+- [simulation-3.R](simulation-3.R)
 	- Further refactoring of simulation towards proper use of dataframes
 
 ## Further work

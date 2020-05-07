@@ -57,26 +57,26 @@ treatment_vs_placebo = generate_table(p_treatment=treatment_prob)
 # sims[,"simulation"]
 
 
-placebo_vs_placebo <- replicate(num_iterations, binom_matrix(placebo_prob,placebo_prob), simplify = FALSE)
-treatment_vs_placebo <- replicate(num_iterations, binom_matrix(placebo_prob,treatment_prob), simplify = FALSE)
-
-placebo_vs_placebo_chi <- Map(to_chisq, placebo_vs_placebo)
-treatment_vs_placebo_chi <- Map(to_chisq, treatment_vs_placebo)
-
-false_positives = Filter(is_significant, placebo_vs_placebo_chi)
-true_positives = Filter(is_significant, treatment_vs_placebo_chi)
-
-num_false_positives = length(false_positives)
-num_true_positives = length(true_positives)
-false_positive_risk = num_false_positives / (num_true_positives + num_false_positives)
-
-cat("False Positives: ", num_false_positives, "\n",
-    "True Positives: ", num_true_positives, "\n",
-    "False Positive Risk: ", false_positive_risk)
-
-
-
-
-as.vector(replicate(3, binom_matrix(placebo_prob,placebo_prob), simplify = FALSE))
+# placebo_vs_placebo <- replicate(num_iterations, binom_matrix(placebo_prob,placebo_prob), simplify = FALSE)
+# treatment_vs_placebo <- replicate(num_iterations, binom_matrix(placebo_prob,treatment_prob), simplify = FALSE)
+# 
+# placebo_vs_placebo_chi <- Map(to_chisq, placebo_vs_placebo)
+# treatment_vs_placebo_chi <- Map(to_chisq, treatment_vs_placebo)
+# 
+# false_positives = Filter(is_significant, placebo_vs_placebo_chi)
+# true_positives = Filter(is_significant, treatment_vs_placebo_chi)
+# 
+# num_false_positives = length(false_positives)
+# num_true_positives = length(true_positives)
+# false_positive_risk = num_false_positives / (num_true_positives + num_false_positives)
+# 
+# cat("False Positives: ", num_false_positives, "\n",
+#     "True Positives: ", num_true_positives, "\n",
+#     "False Positive Risk: ", false_positive_risk)
+# 
+# 
+# 
+# 
+# as.vector(replicate(3, binom_matrix(placebo_prob,placebo_prob), simplify = FALSE))
 
 

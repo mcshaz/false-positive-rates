@@ -1,5 +1,6 @@
 rm(list = ls()) # clear all vars from the current workspace
 
+# Generates a 2x2 matrix binomial distribution live vs die for treatment and control
 do_trial <- function(p_control=0.5, p_treatment=0.8, num_subjects=100){
     binom_control = rbinom(1,num_subjects,p_control)
     binom_treatment = rbinom(1,num_subjects,p_treatment)
@@ -9,17 +10,20 @@ do_trial <- function(p_control=0.5, p_treatment=0.8, num_subjects=100){
                     die=(num_subjects - binom_treatment)))
 }
 
+# Generates a list of trial matrices
+run_trials <- function(num_trials=1000,
+                       num_subjects=100,
+                       p_control=0.5, 
+                       p_treatment=0.8){
+    replicate(num_trials, 
+              do_trial(p_control=p_control, 
+                       p_treatment=p_treatment,
+                       num_subjects=num_subjects), 
+              simplify = FALSE)
+}
 
-# do_trial <- function(p_control=0.5, p_treatment=0.8, num_subjects=100){
-#     binom_control = rbinom(1,num_subjects,p_control)
-#     binom_treatment = rbinom(1,num_subjects,p_treatment)
-#     rbind(live=c(control=binom_control, 
-#                 treatment=binom_treatment),
-#           die=c(control=(num_subjects - binom_control), 
-#                 treatment=(num_subjects - binom_treatment)))
-# }
-
-chisq_parts <- function(trial){
+# Calculates the chi square of a trial and returns the p and x^2
+matrix_to_chisq_parts <- function(trial){
     chi <- chisq.test(trial, correct = TRUE)
     squared <- chi$statistic[["X-squared"]]
     p <- chi$p.value
@@ -27,36 +31,39 @@ chisq_parts <- function(trial){
     return(result)
 }
 
+# Calculates the chi square of a trial and returns the p
 matrix_to_p_value <- function(m){
     chi = chisq.test(m)
     return(chi$p.value)
 }
 
+# Calculates the chi square of a trial and returns the x^2
 matrix_to_x_squared <- function(m){
     chi = chisq.test(m)
     return(chi$statistic[["X-squared"]])
 }
 
-is_significant <- function(p_value){
+# Returns TRUE if a p value is significant
+p_value_is_significant <- function(p_value){
     return(p_value >= 0.03 & p_value <= 0.05)
 }
 
-calculate_phi <- function(x_squared, num_subjects){
-    sqrt((x_squared * x_squared)/num_subjects)
-}
-
+# Converts a list of trial matrices into a dataframe with columns for
+# p_value, x_squared, phi, significant
 analyze_trials <- function(trial_list){
-    chi <- lapply(trial_list, chisq_parts)
+    chi <- lapply(trial_list, matrix_to_chisq_parts)
     df <- data.frame(do.call(rbind, chi))
     calculate_phi <- function(x_squared){
         sqrt((x_squared * x_squared)/num_subjects)
     }
     df$phi <- sapply(df$x_squared, calculate_phi)
-    df$significant <- sapply(df$p_value, is_significant)
+    df$significant <- sapply(df$p_value, p_value_is_significant)
     return(df)
 }
 
-display_comparison <- function(control_statistics, treatment_statistics){
+# Calculate and display the false positive risk for a control vs control and
+# a control vs treatment dataframe
+display_false_positive_risk <- function(control_statistics, treatment_statistics){
     control_significant = subset(control_statistics, significant==TRUE)
     treatment_significant = subset(treatment_statistics, significant==TRUE)
     num_false_positives = nrow(control_significant)
@@ -67,7 +74,10 @@ display_comparison <- function(control_statistics, treatment_statistics){
         "False Positives: ", num_false_positives, "\n",
         "True Positives: ", num_true_positives, "\n",
         "False Positive Risk: ", false_positive_risk, "\n")
+}
 
+# Calculate and display phi and chi averages for the control and treatment dataframes
+display_phi_and_chi_averages = function(control_statistics, treatment_statistics){
     x_squared_mean <- mean(control_statistics$x_squared[control_statistics$p_value <= 0.05])
     x_squared_sd <- sd(control_statistics$x_squared[control_statistics$p_value <= 0.05])
 
@@ -92,16 +102,6 @@ display_comparison <- function(control_statistics, treatment_statistics){
     "    phi sd:", phi_sd, "\n")
 }
 
-run_trials <- function(num_trials,
-                       num_subjects,
-                       p_control, 
-                       p_treatment){
-    replicate(num_trials, 
-              do_trial(p_control=p_control, 
-                       p_treatment=p_treatment,
-                       num_subjects=num_subjects), 
-              simplify = FALSE)
-}
 
 num_trials=100000
 num_subjects=100
@@ -114,7 +114,8 @@ treatment_trials = run_trials(num_trials, num_subjects, p_control, p_treatment)
 control_statistics = analyze_trials(control_trials)
 treatment_statistics = analyze_trials(treatment_trials)
 
-display_comparison(control_statistics, treatment_statistics)
+display_false_positive_risk(control_statistics, treatment_statistics)
+display_phi_and_chi_averages(control_statistics, treatment_statistics)
 
 # Display p_values for significant control vs control trials:
 hist(control_statistics$p_value[control_statistics$significant == TRUE])

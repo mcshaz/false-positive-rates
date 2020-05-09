@@ -2,6 +2,7 @@
 
 Explorations of false positives using R
 
+- [False positive rate - Wikipedia](https://en.wikipedia.org/wiki/False_positive_rate)
 
 ## Project Status
 
@@ -9,7 +10,7 @@ Currently under casual development.
 
 ## Contents
 
-- [advanced-false-positives.R](advanced-false-positives.R)
+- [advanced-false-positive-risk.R](advanced-false-positive-risk.R)
 	- False positive rates, graphing, and phi calculation
 - [simple-false-positive-risk.R](simple-false-positive-risk.R)
 	- Initial work showing a simple calculation of false positive rates

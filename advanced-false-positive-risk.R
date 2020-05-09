@@ -38,7 +38,7 @@ matrix_to_x_squared <- function(m){
 }
 
 is_significant <- function(p_value){
-    return(p_value >= 0.03 && p_value <= 0.05)
+    return(p_value >= 0.03 & p_value <= 0.05)
 }
 
 calculate_phi <- function(x_squared, num_subjects){
@@ -67,7 +67,29 @@ display_comparison <- function(control_statistics, treatment_statistics){
         "False Positives: ", num_false_positives, "\n",
         "True Positives: ", num_true_positives, "\n",
         "False Positive Risk: ", false_positive_risk, "\n")
-    #TODO: graph the differences
+
+    x_squared_mean <- mean(control_statistics$x_squared[control_statistics$p_value <= 0.05])
+    x_squared_sd <- sd(control_statistics$x_squared[control_statistics$p_value <= 0.05])
+
+    phi_mean <- mean(control_statistics$phi[control_statistics$p_value <= 0.05])
+    phi_sd <- sd(control_statistics$phi[control_statistics$p_value <= 0.05])
+
+    x_squared_mean <- mean(treatment_statistics$x_squared[treatment_statistics$p_value <= 0.05])
+    x_squared_sd <- sd(treatment_statistics$x_squared[treatment_statistics$p_value <= 0.05])
+
+    phi_mean <- mean(treatment_statistics$phi[treatment_statistics$p_value <= 0.05])
+    phi_sd <- sd(treatment_statistics$phi[treatment_statistics$p_value <= 0.05])
+
+    cat( "\nControl vs Control\n",
+    "    x_squared mean,", x_squared_mean, "\n",
+    "    x_squared sd:", x_squared_sd, "\n",
+    "    phi mean,", phi_mean, "\n",
+    "    phi sd:", phi_sd, "\n",
+    "\nTreatment vs Control\n",
+    "    x_squared mean,", x_squared_mean, "\n",
+    "    x_squared sd:", x_squared_sd, "\n",
+    "    phi mean,", phi_mean, "\n",
+    "    phi sd:", phi_sd, "\n")
 }
 
 run_trials <- function(num_trials,
@@ -94,5 +116,12 @@ treatment_statistics = analyze_trials(treatment_trials)
 
 display_comparison(control_statistics, treatment_statistics)
 
+# Display p_values for significant control vs control trials:
 hist(control_statistics$p_value[control_statistics$significant == TRUE])
+
+# Display p_values for significant treatment vs control trials:
 hist(treatment_statistics$p_value[treatment_statistics$significant == TRUE])
+
+# Example histogram of phi specifying a p_value range
+# hist(treatment_statistics$phi[treatment_statistics$p_value >= 0.03 & treatment_statistics$p_value <= 0.05])
+

@@ -1,6 +1,6 @@
 # false-positive-rates
 
-Simple explorations of false positives using R
+Explorations of false positives using R
 
 
 ## Project Status
@@ -9,16 +9,23 @@ Currently under casual development.
 
 ## Contents
 
-- [simulation-1.R](simulation-1.R)
-	- Initial attempt to calculate false positive rates
-- [simulation-2.R](simulation-2.R)
-	- Refactoring of simulation-1
-- [simulation-3.R](simulation-3.R)
-	- Further refactoring of simulation towards proper use of dataframes
+- [advanced-false-positives.R](advanced-false-positives.R)
+	- False positive rates, graphing, and phi calculation
+- [simple-false-positive-risk.R](simple-false-positive-risk.R)
+	- Initial work showing a simple calculation of false positive rates
 
-## Further work
 
-- [ ] Finish refactoring work in simulation-3
-- [ ] Rename files to reflect their contents
-- [ ] Add graphing to simulation-3
-- [ ] Add graphing to simulation-1
+## What to Expect
+
+### control vs control (p=0.5 vs p=0.5)
+
+typically:
+	x-squared < 3.8
+	p_value > 0.5
+
+
+### control vs treatment (p=0.5 vs p=0.8) 
+
+typically:
+	x-squared  3.8 to 15
+	p_value < 0.5

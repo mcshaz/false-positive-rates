@@ -49,3 +49,35 @@ t <- cbind(t, simulation=matrices)
 # sims <- cbind(sims, chisq=Map(to_chisq, sims[,"simulation"]))
 # sims <- cbind(sims, phi=Map(to_phi, sims[,"chisq"]))
 # sims <- cbind(sims, significant=Map(is_significant, sims[,"chisq"]))
+
+
+
+
+
+    control_trials = run_trials(num_trials, num_subjects, p_control, p_control)
+    treatment_trials = run_trials(num_trials, num_subjects, p_control, p_treatment)
+
+    control_statistics = analyze_trials(control_trials)
+    treatment_statistics = analyze_trials(treatment_trials)
+
+    #display_comparison(control_statistics, treatment_statistics)
+
+hist(treatment_statistics$p_value[treatment_statistics$p_value >= 0.03 & treatment_statistics$p_value <= 0.05])
+hist(control_statistics$p_value[control_statistics$p_value >= 0.03 & control_statistics$p_value <= 0.05])
+
+c <- sapply(control_trials, matrix_to_p_value)
+t <- sapply(treatment_trials, matrix_to_p_value)
+
+hist(c)
+hist(t)
+
+hist(treatment_statistics$p_value[treatment_statistics$p_value >= 0.03 & treatment_statistics$p_value <= 0.05])
+hist(treatment_statistics$p_value[treatment_statistics$significant == TRUE])
+
+
+# treatment_statistics$significant[treatment_statistics$p_value >= 0.03 & treatment_statistics$p_value <= 0.05]
+
+# treatment_trials = run_trials(num_trials, num_subjects, p_control, p_treatment)
+# chi <- lapply(treatment_trials, chisq_parts)
+# df <- data.frame(do.call(rbind, chi))
+# df_significant <- subset(df, p_value >= 0.03 && p_value <= 0.05)

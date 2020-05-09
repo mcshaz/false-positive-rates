@@ -1,3 +1,5 @@
+rm(list = ls()) # clear all vars from the current workspace
+
 do_test <- function(placebo=0.5, treatment=0.5){
     test_1 <- rbinom(1,100,placebo)
     test_1_minus100 <- 100 - test_1
@@ -23,6 +25,9 @@ treatment_vs_placebo <- replicate(100000, do_test(placebo_prob,treatment_prob))
 false_positives = length(Filter(is_significant, placebo_vs_placebo))
 true_positives = length(Filter(is_significant, treatment_vs_placebo))
 
-cat("False Positives: ", false_positives)
-cat("True Positives: ", true_positives)
-cat("False Positive Risk: ", false_positives / (true_positives + false_positives))
+cat("False Positives: ", false_positives, "\n",
+    "True Positives: ", true_positives, "\n",
+    "False Positive Risk: ", false_positives / (true_positives + false_positives), "\n")
+
+> hist(placebo_vs_placebo)
+> hist(treatment_vs_placebo)

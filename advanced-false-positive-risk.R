@@ -39,13 +39,32 @@ matrix_to_p_value <- function(m){
 
 # Calculates the chi square of a trial and returns the x^2
 matrix_to_x_squared <- function(m){
-    chi = chisq.test(m)
-    return(chi$statistic[["X-squared"]])
+    tryCatch(
+        {
+            chi = chisq.test(m)
+            return(chi$statistic[["X-squared"]])
+        },
+        error=function(cond) {
+            message("Unable to calculate chi square for " + m)
+            message("Here's the original error message:")
+            message(cond)
+            return(NA)
+        },
+        warning=function(cond) {
+            message("Matrix caused a warning during chi square: " + m)
+            message("Here's the original warning message:")
+            message(cond)
+            # Choose a return value in case of warning
+            return(NULL)
+        },
+        finally={}
+    )    
 }
 
 # Returns TRUE if a p value is significant
 p_value_is_significant <- function(p_value){
-    return(p_value >= 0.03 & p_value <= 0.05)
+    return(p_value <= 0.05)
+    #return(p_value >= 0.03 & p_value <= 0.05)
 }
 
 # Converts a list of trial matrices into a dataframe with columns for
@@ -54,7 +73,7 @@ analyze_trials <- function(trial_list){
     chi <- lapply(trial_list, matrix_to_chisq_parts)
     df <- data.frame(do.call(rbind, chi))
     calculate_phi <- function(x_squared){
-        sqrt((x_squared * x_squared)/num_subjects)
+        sqrt((x_squared * x_squared)/(2*num_subjects))
     }
     df$phi <- sapply(df$x_squared, calculate_phi)
     df$significant <- sapply(df$p_value, p_value_is_significant)
@@ -73,33 +92,49 @@ display_false_positive_risk <- function(control_statistics, treatment_statistics
     cat( "\n",
         "False Positives: ", num_false_positives, "\n",
         "True Positives: ", num_true_positives, "\n",
-        "False Positive Risk: ", false_positive_risk, "\n")
+        "False Positive Risk: ", false_positive_risk, "\n\n")
 }
 
 # Calculate and display phi and chi averages for the control and treatment dataframes
 display_phi_and_chi_averages = function(control_statistics, treatment_statistics){
-    x_squared_mean <- mean(control_statistics$x_squared[control_statistics$p_value <= 0.05])
-    x_squared_sd <- sd(control_statistics$x_squared[control_statistics$p_value <= 0.05])
+    control_x_squared_mean <- mean(control_statistics$x_squared[control_statistics$p_value <= 0.05])
+    control_x_squared_sd <- sd(control_statistics$x_squared[control_statistics$p_value <= 0.05])
+    control_phi_mean <- mean(control_statistics$phi[control_statistics$p_value <= 0.05])
+    control_phi_sd <- sd(control_statistics$phi[control_statistics$p_value <= 0.05])
 
-    phi_mean <- mean(control_statistics$phi[control_statistics$p_value <= 0.05])
-    phi_sd <- sd(control_statistics$phi[control_statistics$p_value <= 0.05])
-
-    x_squared_mean <- mean(treatment_statistics$x_squared[treatment_statistics$p_value <= 0.05])
-    x_squared_sd <- sd(treatment_statistics$x_squared[treatment_statistics$p_value <= 0.05])
-
-    phi_mean <- mean(treatment_statistics$phi[treatment_statistics$p_value <= 0.05])
-    phi_sd <- sd(treatment_statistics$phi[treatment_statistics$p_value <= 0.05])
+    treatment_x_squared_mean <- mean(treatment_statistics$x_squared[treatment_statistics$p_value <= 0.05])
+    treatment_x_squared_sd <- sd(treatment_statistics$x_squared[treatment_statistics$p_value <= 0.05])
+    treatment_phi_mean <- mean(treatment_statistics$phi[treatment_statistics$p_value <= 0.05])
+    treatment_phi_sd <- sd(treatment_statistics$phi[treatment_statistics$p_value <= 0.05])
 
     cat( "\nControl vs Control\n",
-    "    x_squared mean,", x_squared_mean, "\n",
-    "    x_squared sd:", x_squared_sd, "\n",
-    "    phi mean,", phi_mean, "\n",
-    "    phi sd:", phi_sd, "\n",
+    "    x_squared mean,", control_x_squared_mean, "\n",
+    "    x_squared sd:", control_x_squared_sd, "\n",
+    "    phi mean,", control_phi_mean, "\n",
+    "    phi sd:", control_phi_sd, "\n",
     "\nTreatment vs Control\n",
-    "    x_squared mean,", x_squared_mean, "\n",
-    "    x_squared sd:", x_squared_sd, "\n",
-    "    phi mean,", phi_mean, "\n",
-    "    phi sd:", phi_sd, "\n")
+    "    x_squared mean,", treatment_x_squared_mean, "\n",
+    "    x_squared sd:", treatment_x_squared_sd, "\n",
+    "    phi mean,", treatment_phi_mean, "\n",
+    "    phi sd:", treatment_phi_sd, "\n\n")
+}
+
+bonus_code <- function(control_statistics, treatment_statistics){
+
+    # Display p_values for significant control vs control trials:
+    hist(control_statistics$p_value[control_statistics$significant == TRUE])
+
+    # Display p_values for significant treatment vs control trials:
+    hist(treatment_statistics$p_value[treatment_statistics$significant == TRUE])
+
+    # num control vs control trials where p <= 0.05
+    length(control_statistics$p_value[control_statistics$p_value <= 0.05])
+
+    # num treatment vs control trials where p <= 0.05
+    length(treatment_statistics$p_value[treatment_statistics$p_value <= 0.05])
+
+    # Example histogram of phi specifying a p_value range
+    hist(treatment_statistics$phi[treatment_statistics$p_value >= 0.03 & treatment_statistics$p_value <= 0.05])
 }
 
 
@@ -116,13 +151,4 @@ treatment_statistics = analyze_trials(treatment_trials)
 
 display_false_positive_risk(control_statistics, treatment_statistics)
 display_phi_and_chi_averages(control_statistics, treatment_statistics)
-
-# Display p_values for significant control vs control trials:
-hist(control_statistics$p_value[control_statistics$significant == TRUE])
-
-# Display p_values for significant treatment vs control trials:
-hist(treatment_statistics$p_value[treatment_statistics$significant == TRUE])
-
-# Example histogram of phi specifying a p_value range
-# hist(treatment_statistics$phi[treatment_statistics$p_value >= 0.03 & treatment_statistics$p_value <= 0.05])
 

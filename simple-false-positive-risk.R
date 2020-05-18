@@ -1,5 +1,9 @@
 rm(list = ls()) # clear all vars from the current workspace
 
+setwd("~/GitHub/false-positive-rates")
+# if(!exists("monteCarloFisher", mode="function")) 
+    sourceCpp("monte-carlo-fisher.cpp")
+
 simTrials <- function (
     monteCarloSims = 10000L,
     participantsPerArm = 100L,
@@ -8,7 +12,7 @@ simTrials <- function (
     
     ctrlOutcomes <- rbinom(monteCarloSims, participantsPerArm, baselineRisk)
     
-    df <- monteCarloFisher(n = participantsPerArm,
+    df <- monteCarloFisher(alloc = participantsPerArm,
                            outcomes = cbind(
                                rbinom(monteCarloSims, participantsPerArm, baselineRisk), # no dif interv
                                ctrlOutcomes, # control group
@@ -46,6 +50,6 @@ simTrials <- function (
 
 simTrials(
     monteCarloSims = 1000000L,
-    participantsPerArm = 100L,
+    participantsPerArm = 200L,
     baselineRisk = 0.5,
     absoluteRR = 0.1)

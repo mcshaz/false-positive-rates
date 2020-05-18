@@ -90,8 +90,7 @@ DataFrame monteCarloFisher(int alloc, IntegerMatrix outcomes){
       int copyIndx = lu.get(a, b);
       if (copyIndx != -1) {
         p[outIndx] = p[copyIndx];
-        if ((ors[copyIndx] < 1.0) != (a < b)) {
-          
+        if ((ors[copyIndx] < 1.0) != (a <= b)) {
           ors[outIndx] = 1.0 / ors[copyIndx];
           ci_lb[outIndx] = 1.0 / ci_ub[copyIndx];
           ci_ub[outIndx] = 1.0 / ci_lb[copyIndx];

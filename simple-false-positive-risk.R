@@ -1,4 +1,5 @@
 rm(list = ls()) # clear all vars from the current workspace
+library(Rcpp)
 
 setwd("~/GitHub/false-positive-rates")
 # if(!exists("monteCarloFisher", mode="function")) 

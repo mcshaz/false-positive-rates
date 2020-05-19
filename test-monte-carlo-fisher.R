@@ -25,7 +25,11 @@ applyMCF <- function() {
 }
 
 #note tolerance below - 2.792825e-05 4,6 and 4,8
+
 stopifnot(isTRUE(all.equal(applyRFisher(), applyMCF(), tolerance=3e-5)))
+bump <- 10L
+outcomes <- outcomes + bump
+alloc <- alloc + bump
 
 stopifnot(isTRUE(all.equal(applyRFisher(), applyMCF())))
 

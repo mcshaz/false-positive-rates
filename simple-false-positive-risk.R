@@ -53,18 +53,18 @@ simTrials <- function (
         resultOut("includes type 1 with p < 0.02", sum(df$p.1 < 0.02)),
         "\nRisk Reduction (", sub, "):",
         resultOut("type 2 errors made", type2),
-        resultOut("type 3 errors made", type3),
+        resultOut("type 3 errors made (rejected because control appeared superior)", type3),
         resultOut("type 2 or 3 errors", type2 + type3),
         resultOut("no error (TP)", monteCarloSims - type2 - type3),"\n")
     
-    cat("\n\n\nPoint effect estimate when type 1 error encountered (Odds Ratio) truth = 1.0:\n")
+    cat("\n\nPoint effect estimate when type 1 error encountered (Odds Ratio) truth = 1.0:\n")
     print(summary(df$or.1[which(df$p.1 < 0.05 & df$or.1 > 1.0)]))
     print(summary(df$or.1[which(df$p.1 < 0.05 & df$or.1 < 1.0)]))
     cat("\nPoint effect estimate when no error (Odds Ratio) truth = ",
         rxRisk * (1 - baselineRisk) / (baselineRisk * (1 - rxRisk)), 
         ":\n")
     print(summary(df$or.2[which(df$p.2 < 0.05 & df$or.2 < 1.0)]))
-    cat("confidence intervals of the odds ratios (lower then upper bounds)\n")
+    cat("\nconfidence intervals of the odds ratios (lower then upper bounds)\n")
     print(summary(df$ci_lb.2[which(df$p.2 < 0.05 & df$or.2 < 1.0)]))
     print(summary(df$ci_ub.2[which(df$p.2 < 0.05 & df$or.2 < 1.0)]))
 }

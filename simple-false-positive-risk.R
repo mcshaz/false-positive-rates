@@ -1,9 +1,7 @@
 rm(list = ls()) # clear all vars from the current workspace
 
-library(random) # if (!require(random)) install.packages("random")
-library(Rcpp)
 setwd("~/GitHub/false-positive-rates")
-if(!exists("monteCarloFisher", mode="function")) 
+# if(!exists("monteCarloFisher", mode="function")) 
     sourceCpp("monte-carlo-fisher.cpp")
 
 a <- c(0.1)
@@ -16,7 +14,7 @@ simTrials <- function (
     ctrlOutcomes <- rbinom(monteCarloSims, participantsPerArm, baselineRisk)
     rxRisk <- baselineRisk - absoluteRR
     
-    df <- monteCarloFisher(n = participantsPerArm * 2L,
+    df <- monteCarloFisher(alloc = participantsPerArm,
                            outcomes = cbind(
                                rbinom(monteCarloSims, participantsPerArm, baselineRisk), # no dif interv
                                ctrlOutcomes, # control group
@@ -70,7 +68,7 @@ simTrials <- function (
 }
 
 simTrials(
-    monteCarloSims = 100000L,
-    participants = 100L,
+    monteCarloSims = 1000000L,
+    participantsPerArm = 200L,
     baselineRisk = 0.5,
     absoluteRR = 0.1)

@@ -99,7 +99,7 @@ server <- function(input, output){
             i <- 1
             if (pwr == "pwr"){
                 getPwr <- function(n) {
-                    return(unname(pwr.p.test(h = h , n = n/2, sig.level = 0.05, alternative = "two.sided")[["power"]])*100)
+                    return(unname(pwr.2p2n.test(h = h , n1 = n/2, n2 = n/2, sig.level = 0.05, alternative = "two.sided")[["power"]])*100)
                 }
                 returnVar$pwr <- sapply(returnVar[,1], getPwr)
             } else {
@@ -129,7 +129,6 @@ server <- function(input, output){
         nDta$time <- factor(nDta$time, levels = displayVariables)
         colScheme <- setNames( c('#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e','#e6ab02','#a6761d')
                   , levels(nDta$time))
-        print(colScheme)
         ggplot(nDta, aes(x=trialN, y=value, group=time)) +
             geom_line(size=1, aes(col=time))+
             # geom_point(aes(col=time))+
